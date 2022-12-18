@@ -26,7 +26,6 @@ EOF
 singleUpload()
 {
   filePath="${i//~/$HOME}"
-  echo "$filePath"
   if [[ ! -f "$filePath" ]]; then { echo "Error: invalid file path"; return 1;}; fi
   tempFileName=$(echo "$filePath" | sed "s/.*\///")
   echo "Uploading $tempFileName"
@@ -37,11 +36,9 @@ singleDowload()
 {
     echo "Downloading $3"
     if [[ ! -d "$1" ]]; then
-      mkdir -p "$1/$2"
-    elif [[ ! -d "$1/$2" ]]; then
-      mkdir "$1/$2"
+      mkdir "$1"
     fi
-    response=$(curl --progress-bar --output-dir "$1"/"$2" -o "$3" "https://transfer.sh/$2/$3") || { echo "Failure!"; return 1;}
+    response=$(curl --progress-bar --output-dir "$1" -o "$3" "https://transfer.sh/$2/$3") || { echo "Failure!"; return 1;}
 }
 
 printDownloadResponse() 
@@ -51,17 +48,22 @@ printDownloadResponse()
   fi
 }
 
-case "$1" in
-  "-v" ) echo "$currentVersion";;
-  "-h" ) echo "$help";;
-  "-d" ) 
-    singleDowload "$2" "$3" "$4"  
-    printDownloadResponse
-    ;;
-  * )
-    for i in "$@"; do
-      singleUpload "$i" || exit 1
-      printUploadResponse 
-    done
-    ;;
-esac
+if [[ $# -gt 0 ]]; then
+  case "$1" in
+    "-v" ) echo "$currentVersion";;
+    "-h" ) echo "$help";;
+    "-d" ) 
+      singleDowload "$2" "$3" "$4"  
+      printDownloadResponse
+      ;;
+    * )
+      for i in "$@"; do
+        singleUpload "$i" || exit 1
+        printUploadResponse 
+      done
+      ;;
+  esac
+else 
+  echo "Specify arguments!"
+  echo "$help"
+fi
