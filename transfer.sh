@@ -36,13 +36,19 @@ singleUpload()
 singleDowload()
 {
     echo "Downloading $3"
-    response=$(curl --progress-bar -o "$1" "https://transfer.sh/$2/$3") || { echo "Failure!"; return 1;}
+    #response=$(curl --progress-bar -o "$3" "https://transfer.sh/$2/$3" --output-dir ./"$1") || { echo "Failure!"; return 1;}      
+    if [[ -d "$1" ]]; then
+      response=$(curl --progress-bar --output-dir ./"$1" -o "$3" "https://transfer.sh/$2/$3") || { echo "Failure!"; return 1;}      
+    else
+      echo "Error: invalid file path" 
+      return 1
+    fi
 }
 
 printDownloadResponse() 
 {
   if [[ $? == 0 ]]; then
-    echo "Succes!"
+    echo "Success!"
   fi
 }
 
