@@ -12,7 +12,7 @@ Examples:
 
 httpSingleUpload()
 {
-    response=$(curl -A curl --progress-bar --upload-file "$1" "https://transfer.sh/$1") || { echo "Failure!"; return 1;}
+    response=$(curl --progress-bar --upload-file "$1" "https://transfer.sh/$2") || { echo "Failure!"; return 1;}
 }
 
 printUploadResponse()
@@ -26,10 +26,11 @@ EOF
 singleUpload()
 {
   filePath="${i//~/$HOME}"
-  if [[ ! -f "$filePath" ]]; then { echo "Error: invalid file path"; return 1;}; fi
   tempFileName=$(echo "$filePath" | sed "s/.*\///")
-  echo "Uploading $tempFileName"
-  httpSingleUpload "$tempFileName"
+  echo "Uploading $filePath"
+  echo "$tempFileName"
+  if [[ ! -f "$filePath" ]]; then { echo "Error: invalid file path"; return 1;}; fi
+  httpSingleUpload "$filePath" "$tempFileName"
 }
 
 singleDowload()
